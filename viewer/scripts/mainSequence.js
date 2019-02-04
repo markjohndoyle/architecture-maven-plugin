@@ -1,0 +1,3 @@
+var scatterOptions = {
+    showLine: false
+};

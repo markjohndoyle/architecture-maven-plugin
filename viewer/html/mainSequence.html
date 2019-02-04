@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="../css/mainSequence.css">
+    <link rel="stylesheet" href="../node_modules/chartist/dist/chartist.min.css">
+    <link rel="stylesheet" href="../node_modules/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.css">
+    <link rel="stylesheet" href="../node_modules/materialize-css/dist/css/materialize.min.css">
+    <link rel="stylesheet" href="../node_modules/material-design-icons/iconfont/material-icons.css">
+    <title>Main Sequence</title>
+</head>
+
+<body>
+    <nav>
+        <div class="nav-wrapper">
+            <ul class="left hide">
+                <li>
+                    <a href="#!">
+                        <i class="material-icons">menu</i>
+                    </a>
+                </li>
+            </ul>
+            <a href="#" class="brand-logo center">Main Sequence</a>
+        </div>
+    </nav>
+
+    <!-- <div class="container"> -->
+    <div class="row">
+        <div class="col s12 m8 l9">
+            <div class="chart-wrapper">
+                <div class="ct-chart ct-golden-section"></div>
+            </div>
+        </div>
+    </div>
+    <!-- </div> -->
+
+    <script src="../node_modules/chartist/dist/chartist.js"></script>
+    <script>const Chartist = require('chartist');</script>
+    <script src="../node_modules/chartist-plugin-axistitle/dist/chartist-plugin-axistitle.js"></script>
+    <script src="../node_modules/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.js"></script>
+    <script>
+        const electron = require('electron');
+        
+        const { ipcRenderer } = electron;
+
+        let chart;
+
+        var scatterOptions = {
+            width: '100%',
+            plugins: [
+                Chartist.plugins.tooltip(),
+                Chartist.plugins.ctAxisTitle({
+                    axisX: {
+                        axisTitle: 'Instability',
+                        axisClass: 'ct-axis-title',
+                        offset: {
+                            x: 0,
+                            y: 50
+                        },
+                        textAnchor: 'middle'
+                    },
+                    axisY: {
+                        axisTitle: 'Abstraction',
+                        axisClass: 'ct-axis-title',
+                        offset: {
+                            x: 0,
+                            y: 0
+                        },
+                        flipTitle: false
+                    }
+                })
+            ],
+            showLine: false,
+            axisY: {
+                type: Chartist.FixedScaleAxis,
+                onlyInteger: true,
+                low: 0,
+                high: 1,
+                divisor: 2
+            },
+            axisX: {
+                type: Chartist.FixedScaleAxis,
+                onlyInteger: true,
+                low: 0,
+                high: 1,
+                divisor: 2
+            }
+        };
+
+        // When data loaded message is received
+        ipcRenderer.on('data:loaded', (err, data) => {
+            const xySeries = { series: getPlotData(data) };
+            const xyData = xySeries;
+            xyData.labels = ["Instability", "Abstraction"];
+            chart = new Chartist.Line('.ct-chart', xyData, scatterOptions);
+        });
+
+        function getPlotData(data) {
+            const filtered = data.map((elem, index, array) => {
+                return [{ x: elem[1], y: elem[2] }];
+            });
+            return filtered;
+        }
+    </script>
+</body>
+
+</html>
