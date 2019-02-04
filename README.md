@@ -1,0 +1,1 @@
+# architecture-maven-plugin
